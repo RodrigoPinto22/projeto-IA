@@ -57,7 +57,7 @@ def piece_ganhou(tabuleiro,linha,coluna,piece):
         contador = 0
         x = linha
         y = coluna
-        while 0<=x<6 and 0<=y<7 and tabuleiro[x][y] == piece:
+        while 0<=x<NUM_LINS and 0<=y<NUM_COLS and tabuleiro[x][y] == piece:
             x += direcaox
             y += direcaoy
             contador += 1
