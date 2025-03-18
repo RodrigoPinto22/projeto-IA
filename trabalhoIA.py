@@ -28,20 +28,53 @@ def imprimir_tabuleiro(tabuleiro):
         print(" ".join(linha))
     print("1 2 3 4 5 6 7")    
 
-#def posicao_valida(tabuleiro,coluna):
+def jogada_valida(tabuleiro,coluna):
+    return tabuleiro[0][coluna] == '-'
 
-def por_peca(tabuleiro,coluna,peca): #drop_piece
+"""def por_peca(tabuleiro,coluna,peca): função luiza
     
     for i in range(5, -1, -1):
         if (tabuleiro[i][coluna - 1] == '-' ):
             tabuleiro[i][coluna - 1] = peca
-            break
+            break"""
+
+
+def linha_piece(tabuleiro,coluna):
+    i = 0
+    while (i <= 5 and tabuleiro[i][coluna] == '-'):
+        i +=1
+    return i-1
+
+
+def drop_piece(tabuleiro,linha,coluna,piece):
+    tabuleiro[linha][coluna] = piece
+
+def piece_ganhou(tabuleiro,linha,coluna,piece): 
+    def contar_direcao(direcaox, direcaoy,piece):
+        contador = 0
+        x = linha
+        y = coluna
+        while 0<=x<6 and 0<=y<7 and tabuleiro[x][y] == piece:
+            x += direcaox
+            y += direcaoy
+            contador += 1
+        return contador
+
+    #horizontal
+    if contar_direcao(0,-1,piece) + contar_direcao(0,1,piece) - 1 >= 4:
+        return True
+
+    #vertical
+    if contar_direcao(1,0,piece) >= 4: #nao pode ir para cima na vertical
+        return True
     
+    #diagonais
+    if contar_direcao(1,1,piece) + contar_direcao(-1,-1,piece) - 1 >= 4:
+        return True
 
-#def peca_ganhou(tabuleiro,coluna,peca): 
-
-#def linha_peca(tabuleiro,coluna) ?? 
-
+    #a outra diagonal (n me lembro do nome)
+    if contar_direcao(1,-1,piece) + contar_direcao(-1,1,piece) -1 >=4:
+        return True
 
 tabuleiro = criar_tabuleiro()
 #imprimir_tabuleiro(tabuleiro)
@@ -53,15 +86,21 @@ while not game_over:
     imprimir_tabuleiro(tabuleiro)
     print("~~~~~~~~~~~~~")
 
-    if turn == 'X':
-        print("It is now X's turn.")
-        coluna = int(input(("Select a column to drop your piece: ")))
-        por_peca(tabuleiro, coluna, 'X')
+    print("It is now " + turn + "'s turn.")
+    coluna = int(input(("Select a column to drop your piece: "))) - 1
 
-    else:
-        print("It is now O's turn.")
-        coluna = int(input("Select a column to drop your piece: "))
-        por_peca(tabuleiro, coluna, 'O')
+    if jogada_valida(tabuleiro,coluna):
+        linha = linha_piece(tabuleiro,coluna) 
+        drop_piece(tabuleiro,linha,coluna,turn)
+        if piece_ganhou(tabuleiro,linha,coluna,turn):
+            imprimir_tabuleiro(tabuleiro)
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("Congrats!!! Player "+ turn +" wins!")
+            game_over = True
+        else:
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("Invalid choice. That column is full.")
+            break
 
     if turn == 'X':
         turn = 'O'
