@@ -75,6 +75,7 @@ def piece_ganhou(tabuleiro,linha,coluna,piece):
     #a outra diagonal (n me lembro do nome)
     if contar_direcao(1,-1,piece) + contar_direcao(-1,1,piece) -1 >=4:
         return True
+    return False
 
 tabuleiro = criar_tabuleiro()
 #imprimir_tabuleiro(tabuleiro)
@@ -97,10 +98,10 @@ while not game_over:
             print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             print("Congrats!!! Player "+ turn +" wins!")
             game_over = True
-        else:
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            print("Invalid choice. That column is full.")
-            break
+    else:
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Invalid choice. That column is full.")
+        break
 
     if turn == 'X':
         turn = 'O'
