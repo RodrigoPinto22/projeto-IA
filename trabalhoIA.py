@@ -19,8 +19,11 @@
 jogo = connectFour()
 jogo.imprimir_tabela()"""
 
+NUM_LINS = 6
+NUM_COLS = 7
+
 def criar_tabuleiro():
-    tabuleiro = [['-' for _ in range(7)] for _ in range(6)]
+    tabuleiro = [['-' for _ in range(NUM_COLS)] for _ in range(NUM_FINS)]
     return tabuleiro
 
 def imprimir_tabuleiro(tabuleiro):
@@ -41,7 +44,7 @@ def jogada_valida(tabuleiro,coluna):
 
 def linha_piece(tabuleiro,coluna):
     i = 0
-    while (i <= 5 and tabuleiro[i][coluna] == '-'):
+    while (i <= LINS and tabuleiro[i][coluna] == '-'):
         i +=1
     return i-1
 
