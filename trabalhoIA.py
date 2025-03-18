@@ -30,11 +30,18 @@ def imprimir_tabuleiro(tabuleiro):
 
 #def posicao_valida(tabuleiro,coluna):
 
-#def por_peca(tabuleiro,coluna,peca): drop_piece
+def por_peca(tabuleiro,coluna,peca): #drop_piece
+    
+    for i in range(5, -1, -1):
+        if (tabuleiro[i][coluna - 1] == '-' ):
+            tabuleiro[i][coluna - 1] = peca
+            break
+    
 
 #def peca_ganhou(tabuleiro,coluna,peca): 
 
 #def linha_peca(tabuleiro,coluna) ?? 
+
 
 tabuleiro = criar_tabuleiro()
 #imprimir_tabuleiro(tabuleiro)
@@ -49,14 +56,15 @@ while not game_over:
     if turn == 'X':
         print("It is now X's turn.")
         coluna = int(input(("Select a column to drop your piece: ")))
-
+        por_peca(tabuleiro, coluna, 'X')
 
     else:
-         print("It is now O's turn.")
-         coluna = int(input("Select a column to drop your piece: "))
-         
+        print("It is now O's turn.")
+        coluna = int(input("Select a column to drop your piece: "))
+        por_peca(tabuleiro, coluna, 'O')
 
     if turn == 'X':
         turn = 'O'
     else: turn = 'X'
+
 
