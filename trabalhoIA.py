@@ -19,11 +19,11 @@
 jogo = connectFour()
 jogo.imprimir_tabela()"""
 
-NUM_LINS = 6
+NUM_ROWS = 6
 NUM_COLS = 7
 
 def criar_tabuleiro():
-    tabuleiro = [['-' for _ in range(NUM_COLS)] for _ in range(NUM_FINS)]
+    tabuleiro = [['-' for _ in range(NUM_COLS)] for _ in range(NUM_ROWS)]
     return tabuleiro
 
 def imprimir_tabuleiro(tabuleiro):
@@ -44,7 +44,7 @@ def jogada_valida(tabuleiro,coluna):
 
 def linha_piece(tabuleiro,coluna):
     i = 0
-    while (i <= LINS and tabuleiro[i][coluna] == '-'):
+    while (i <= NUM_ROWS-1 and tabuleiro[i][coluna] == '-'):
         i +=1
     return i-1
 
@@ -57,7 +57,7 @@ def piece_ganhou(tabuleiro,linha,coluna,piece):
         contador = 0
         x = linha
         y = coluna
-        while 0<=x<NUM_LINS and 0<=y<NUM_COLS and tabuleiro[x][y] == piece:
+        while 0<=x<NUM_ROWS and 0<=y<NUM_COLS and tabuleiro[x][y] == piece:
             x += direcaox
             y += direcaoy
             contador += 1
@@ -81,10 +81,10 @@ def piece_ganhou(tabuleiro,linha,coluna,piece):
     return False
 
 tabuleiro = criar_tabuleiro()
-#imprimir_tabuleiro(tabuleiro)
 game_over = False
 turn = 'X'
 
+num_jogadas = NUM_ROWS*NUM_COLS
 while not game_over:
 
     imprimir_tabuleiro(tabuleiro)
@@ -98,13 +98,20 @@ while not game_over:
         drop_piece(tabuleiro,linha,coluna,turn)
         if piece_ganhou(tabuleiro,linha,coluna,turn):
             imprimir_tabuleiro(tabuleiro)
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~")
             print("Congrats!!! Player "+ turn +" wins!")
             game_over = True
+        num_jogadas -= 1
+        if (num_jogadas == 0 and game_over == False):
+            imprimir_tabuleiro(tabuleiro)
+            print("~~~~~~~~~~~~~")
+            print("Draw!!!")
+            break
+        
     else:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print("Invalid choice. That column is full.")
-        break
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Invalid choice. That column is full. Try again!")
+        continue
 
     if turn == 'X':
         turn = 'O'
