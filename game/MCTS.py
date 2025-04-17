@@ -18,7 +18,7 @@ class NoBusca:
 
 
     def adicionar_filhos(self, filhos):
-        """
+        """ 
         Adiciona filhos ao dicionário da instância.
 
         Args:
@@ -50,6 +50,7 @@ class MCTS:
         self.raiz = NoBusca(jogada=None, pai=None)
         self.tempo_total = 0
         self.num_simulacoes = 0
+        self.debug_mostrado = False
 
     def selecionar_no(self):
         no = self.raiz
@@ -61,6 +62,7 @@ class MCTS:
 
             valores = [filho.valor() for filho in filhos] #calcula o UCT de cada filho
             melhor_valor = max(valores)
+            
 
             #filtra os que têm melhor valor
             melhores = [filho for filho in filhos if filho.valor() == melhor_valor]
@@ -94,12 +96,76 @@ class MCTS:
 
     def simular(self,estado):
         #simula um jogo a partir do estado atual
-        while not estado.fim_do_jogo():
-            jogada = random.choice(estado.jogadas_validas())
-            estado = estado.fazer_jogada(jogada) 
+
+        #as colunas centrais dao mais oportunidades de vitoria h/v/d
+        def jogadas_centrais_primeiro(jogadas):
+            centro = estado.NUM_COLS // 2
+            return sorted(jogadas, key=lambda x: abs(x - centro))
+
+        
+        #vai analisar se a jogada permite q o adversario venca na proxima rodada
+        #heuristica de defesa
+        def jogada_segura(jogada, estado_atual):
+            #simula a jogada do jogador atual sem alterar o estado
+            jogador_atual = estado_atual.jogador_atual
+            adversario = 'O' if jogador_atual == 'X' else 'X'
+            linha_jog = estado_atual.simular_jogada_temporaria(jogada, jogador_atual)
+            estado_atual.alterar_jogador()
+
+            insegura = False
+            for col in estado_atual.jogadas_validas():
+                linha_adv = estado_atual.simular_jogada_temporaria(col, adversario)
+                if estado_atual.piece_ganhou(linha_adv, col, adversario):
+                    insegura = True
+                estado_atual.desfazer_jogada(linha_adv, col)
+                if insegura:
+                    break
+
+            estado_atual.alterar_jogador()
+            estado_atual.desfazer_jogada(linha_jog, jogada)
+
+            return not insegura
+
+        simulado = estado.clone()
+        while not simulado.fim_do_jogo():
+            jogadas = simulado.jogadas_validas()
+            if not jogadas:
+                break
+            jogadas = jogadas_centrais_primeiro(jogadas)
+
+            jogada_escolhida = None
+
+            #heuristica de ataque
+            for jog in jogadas:
+                linha = simulado.simular_jogada_temporaria(jog, simulado.jogador_atual)
+                
+                if simulado.piece_ganhou(linha, jog, simulado.jogador_atual):
+                    simulado.desfazer_jogada(linha, jog)
+                    jogada_escolhida = jog
+                    break
+
+                simulado.desfazer_jogada(linha, jog)
+
+            #se nenhuma jogada vencer uso a heuristica de defesa
+            if jogada_escolhida is None:
+                for jog in jogadas:
+                    testar_estado = simulado.clone()
+                    if jogada_segura(jog, testar_estado):
+                        jogada_escolhida = jog
+                        break
+
+            #caso nenhuma seja segura, escolhe a mais central
+            if jogada_escolhida is None:
+                jogada_escolhida = jogadas[0]
+
+            #aplica jogada escolhida
+            linha = simulado.linha_piece(jogada_escolhida)
+            simulado.tabuleiro[linha][jogada_escolhida] = simulado.jogador_atual
+            simulado.num_jogadas -= 1
+            simulado.alterar_jogador()
 
         #returna 1,2 ou 3 (X ganhou, 0 ganhou ou empate)
-        return estado.resultado()
+        return simulado.resultado()
 
 
     def backpropagate(self,no,jogador,resultado):
@@ -135,32 +201,35 @@ class MCTS:
 
         self.tempo_total = time.process_time() - inicio #guarda o tempo total de execucao
 
-    """def melhor_jogada(self):
-        if self.estado_raiz.fim_do_jogo():
-            return -1
-
-        filhos_validos = [f for f in self.raiz.filhos.values() if f.jogada is not None and f.jogada>=0]
-        #filhos = self.raiz.filhos.values() #jogadas possiveis a partir da raiz
-
-        if not filhos_validos:
-            #se nao conseguir expandir por falta de tempo
-            jogadas_possiveis=self.estado_raiz.jogadas_validas()
-            if jogadas_possiveis:
-                return random.choice(jogadas_possiveis)
-            else:
-                return -1
-
-        max_visitas = max(filho.visitas for filho in filhos_validos)
-        melhores = [filho for filho in filhos_validos if filho.visitas == max_visitas]
-        melhor = random.choice(melhores)
-
-        #retorna a jogada associada ao melhor filho
-        return melhor.jogada"""
 
     def melhor_jogada(self):
         jogadas_possiveis = self.estado_raiz.jogadas_validas()
+        jogador = self.estado_raiz.jogador_atual
         if not jogadas_possiveis:
             return -1  #o jogo realmente acabou
+
+
+        #ataque
+        for col in jogadas_possiveis:
+            estado_teste = self.estado_raiz.clone()
+            try:
+                linha = estado_teste.simular_jogada_temporaria(col, jogador)
+                if estado_teste.piece_ganhou(linha, col, jogador):
+                    return col
+            except:
+                continue
+
+        #defesa
+        adversario = 'O' if jogador == 'X' else 'X'
+        for col in jogadas_possiveis:
+            estado_teste = self.estado_raiz.clone()
+            try:
+                linha = estado_teste.simular_jogada_temporaria(col, adversario)
+                if estado_teste.piece_ganhou(linha, col, jogador):
+                    return col
+            except:
+                continue
+
 
         filhos_validos = [f for f in self.raiz.filhos.values() if f.jogada in jogadas_possiveis]
 
@@ -185,5 +254,5 @@ class MCTS:
             self.raiz = NoBusca(jogada=None,pai=None)
 
     def estatisticas(self):
-        
         return self.num_simulacoes, self.tempo_total
+        
