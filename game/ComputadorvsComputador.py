@@ -6,35 +6,47 @@ from copy import deepcopy
 
 def jogar_ComputadorvsComputador():
     jogo = jogoConnectFour()
-    estado = jogoConnect4Adaptador(jogo)
+    #estado = deepcopy(jogo)
 
-    computador_X = MCTS(deepcopy(estado))
-    computador_O = MCTS(deepcopy(estado))
+    computador_X = MCTS(deepcopy(jogo))
+    computador_O = MCTS(deepcopy(jogo))
 
-    jogador_atual = 'X'
+    #jogador_atual = 'X'
 
     print("\nWhich one is going to win?\n")
 
     while not jogo.game_over:
         jogo.imprimir_tabuleiro()
+        print("~~~~~~~~~~~~~")
+        print(f"It is now {jogo.jogador_atual}'s turn.")
 
-        computador = computador_X if jogador_atual == 'X' else computador_O
+        if jogo.jogador_atual == 'X':
+            computador = computador_X
+        else:
+            computador = computador_O
 
-        print(f"Player {jogador_atual} is thinking...")
-        computador.pesquisar(tempo_limite=1.5)
+        print(f"Player {jogo.jogador_atual} is thinking...")
+        computador.pesquisar(tempo_limite=3.0)
         coluna = computador.melhor_jogada()
 
-        print(f"Player {jogador_atual} chose the column {coluna+1}")
+        print(f"Player {jogo.jogador_atual} chose the column {coluna+1}")
 
         linha = jogo.linha_piece(coluna)
+        jogador = jogo.jogador_atual
         jogo.drop_piece(linha,coluna)
 
         computador_X.aplicar_jogada(coluna)
         computador_O.aplicar_jogada(coluna)
 
-        if jogo.piece_ganhou(linha,coluna):
+        num_simulacoes, tempo = computador.estatisticas()
+        print(f"Simulations: {num_simulacoes} in {tempo:.2f} seconds")
+
+        if jogo.piece_ganhou(linha,coluna,jogo.jogador_atual):
             jogo.imprimir_tabuleiro()
-            print(f"Player {jogador_atual} won!!!")
+            if jogador == 'X':
+                print("Player X wins!!!")
+            else:
+                print("Player O wins!!!")
             break
 
         elif jogo.num_jogadas == 0:
@@ -42,7 +54,7 @@ def jogar_ComputadorvsComputador():
             print(f"Draw!!!")
             break
 
-        jogador_atual = 'O' if jogador_atual == 'X' else 'X'
+        jogo.alterar_jogador()
 
 if __name__ == "__main__":
     jogar_ComputadorvsComputador()
