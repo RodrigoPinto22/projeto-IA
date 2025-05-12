@@ -11,7 +11,7 @@ class NoBusca:
         self.visitas = 0            
         self.valor_total = 0        #semelhante ao numero de vitorias
         """a vitoria, perda e empate vao ter valores diferentes. por exemplo,
-        vitoria +=1 perda +=0 e empate +=0.5. como pode se tratar de um numero fracionario
+        vitoria +=1 perda +=0 e empate +=0. como pode se tratar de um numero fracionario
         chamar a variavel de vitorias levaria a confusao """
         self.filhos = {}
         self.resultado = 0          #se o estado for terminal armazena 1,2 ou 3
@@ -182,7 +182,7 @@ class MCTS:
             no.valor_total +=recompensa
 
             if resultado == 3:
-                recompensa = 0.5
+                recompensa = 0
             else:
                 recompensa = 1 - recompensa #vamos alterar a recompensa entre os niveis da arvore
 
@@ -255,4 +255,3 @@ class MCTS:
 
     def estatisticas(self):
         return self.num_simulacoes, self.tempo_total
-        
