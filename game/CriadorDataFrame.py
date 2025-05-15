@@ -30,13 +30,13 @@ def gerador(nJogos):
                     contador += 1
                     posicao = tabuleiro[col][row]
                     if posicao == 'X':
-                        estado_dict[f'Pos {contador}'] = 'X'
+                        estado_dict[f'Posição {contador}'] = 'X'
                     elif posicao =='O':
-                        estado_dict[f'Pos {contador}'] = 'O'
+                        estado_dict[f'Posição {contador}'] = 'O'
                     else:
-                        estado_dict[f'Pos {contador}'] = None
+                        estado_dict[f'Posição {contador}'] = None
             estado_dict['Melhor jogada'] = coluna
-            estado_dict['Nº Vitorias'] = (jogador.raiz.valor_total/jogador.raiz.visitas)*100 
+            estado_dict['Probabilidade de vitória (%)'] = (jogador.raiz.valor_total/jogador.raiz.visitas)*100 
             dataset.append(estado_dict)
 
             linha = jogo.linha_piece(coluna)
