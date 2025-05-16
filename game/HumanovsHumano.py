@@ -12,7 +12,7 @@ def jogar_HumanovsHumano():
         try:
             coluna = int(input(("Select a column to drop your piece: "))) - 1
         except ValueError:
-            print("Invalid input. Pleas enter a number.")
+            print("Invalid input. Please enter a number.")
             continue
 
         if not jogo.jogada_valida(coluna):
