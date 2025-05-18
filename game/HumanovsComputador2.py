@@ -43,9 +43,9 @@ def jogar_HumanovsComputador2():
 
             print(f"I choose this column: {coluna+1}")
 
-            linha = jogo.linha_piece(coluna)
+            linha = jogo.linha_piece(nova_coluna)
             jogador = jogo.jogador_atual
-            jogo.drop_piece(linha,coluna)
+            jogo.drop_piece(linha,nova_coluna)
             mcts.aplicar_jogada(nova_coluna)
 
 
@@ -73,4 +73,6 @@ def jogar_HumanovsComputador2():
 
 if __name__ == "__main__":
     jogar_HumanovsComputador2()
+
+
 
